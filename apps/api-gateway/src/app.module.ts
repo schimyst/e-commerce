@@ -15,12 +15,12 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
   providers: [
     AppService,
     {
-      provide: 'AUTH_SERVICE',
+      provide: 'USERS_SERVICE',
       useFactory: (configService: ConfigService) => {
         const RABBITMQ_USER = configService.get('RABBITMQ_USER');
         const RABBITMQ_PASSWORD = configService.get('RABBITMQ_PASSWORD');
         const RABBITMQ_HOST = configService.get('RABBITMQ_HOST');
-        const RABBITMQ_AUTH_QUEUE = configService.get('RABBITMQ_AUTH_QUEUE');
+        const RABBITMQ_USERS_QUEUE = configService.get('RABBITMQ_USERS_QUEUE');
 
         return ClientProxyFactory.create({
           transport: Transport.RMQ,
@@ -28,7 +28,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
             urls: [
               `amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}`,
             ],
-            queue: RABBITMQ_AUTH_QUEUE,
+            queue: RABBITMQ_USERS_QUEUE,
             queueOptions: {
               durable: true,
             },

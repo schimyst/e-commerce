@@ -1,5 +1,23 @@
 version: '3'
 services:
+  postgres:
+    image: postgres
+    env_file:
+      - .env
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+
+  postgres_admin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - '15432:80'
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -11,3 +29,33 @@ services:
       - '15672:15672'
     env_file:
       - .env
+
+  api-gateway:
+    build: 
+      context: ./
+      dockerfile: ./apps/api-gateway/Dockerfile
+    ports:
+      - '4000:5000'
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - users
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: yarn start:dev api-gateway
+
+  users:
+    build: 
+      context: ./
+      dockerfile: ./apps/users/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - postgres
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: yarn start:dev users
