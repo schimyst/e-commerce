@@ -9,15 +9,6 @@ services:
     volumes:
       - ./db/data:/var/lib/postgresql/data
 
-  postgres_admin:
-    image: dpage/pgadmin4
-    depends_on:
-      - postgres
-    env_file:
-      - .env
-    ports:
-      - '15432:80'
-
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
